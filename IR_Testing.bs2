@@ -1,0 +1,67 @@
+' Troop 566 Robotics Meritbadge Class May 8th, 2011
+' Name:     <put name here>
+' Filename: <putfilenamehere>
+' Version:  <put date here>
+' Program:  <put name of program here>
+' Comments: <add any info you want>
+'           <perhaps additional lines>
+'
+' {$STAMP BS2}     Tell Compiler what CPU we are using
+' {$PBASIC 2.5}    Tell Compiler which CPU firmware we have
+'
+' Hardware Configuration Below (Note First letter is in uppercase)
+' Replace this line with Pin definitions (perhaps copied from C:/robot_config_a_2011-05-08.bs2").
+LeftOut PIN 9
+LeftIn PIN 10
+Speaker PIN 4
+RightOut PIN 7
+RightIn  PIN 8
+'
+'Constants defined below: (Note First letters is a capital)
+lState VAR Byte
+rState VAR Byte
+
+'
+'Variables defined below: (Note First letter is lowercase)
+ irDetectLeft  VAR Bit
+ irDetectRight VAR Bit
+'
+'Start Up Code
+PAUSE 500                     'Let Windows know this USB is not a MOUSE
+DEBUG "Program Starting",CR   'Message DEBUG window if USB connected
+FREQOUT Speaker,2000,3000     'Signal Start of Program
+
+'
+'USER CODE STARTS HERE:
+
+DEBUG "IR DETECTORS", CR
+DEBUG "LEFT   RIGHT", CR
+DEBUG "----   -----"
+
+DO
+  FREQOUT LeftOut, 100, 38500
+  irDetectLeft = LeftIn
+
+  FREQOUT RightOut, 100, 38500
+  irDetectRight = RightIn
+
+  IF irDetectLeft = 0 THEN lState = "L" ELSE lState = " "
+  IF irDetectRight = 0 THEN rState = "R" ELSE rState = " "
+
+ DEBUG CRSRXY, 2, 4, BIN1 irDetectLeft,
+       CRSRXY, 9, 4, BIN1 irDetectRight,
+       CRSRXY, 2, 5, REP lState\1,
+       CRSRXY, 9, 5, REP rState\1
+
+
+ PAUSE 100
+
+
+LOOP
+
+
+
+
+'
+END  'Conserve Battery Power if nothing left to do but wait for pushbutton or user to turn off switch
+' vim: ft=pbasic:sw=4:ts=4:et:

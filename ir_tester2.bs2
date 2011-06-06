@@ -1,0 +1,82 @@
+' Troop 566 Robotics Meritbadge Class May 8th, 2011
+' Name:     <put name here>
+' Filename: <putfilenamehere>
+' Version:  <put date here>
+' Program:  <put name of program here>
+' Comments: <add any info you want>
+'           <perhaps additional lines>
+'
+' {$STAMP BS2}     Tell Compiler what CPU we are using
+' {$PBASIC 2.5}    Tell Compiler which CPU firmware we have
+'
+' Hardware Configuration Below (Note First letter is in uppercase)
+' Replace this line with Pin definitions (perhaps copied from C:/robot_config_a_2011-05-08.bs2").
+PButton PIN 5
+Speaker PIN 4
+LeftOut PIN 9
+LeftIn PIN 10
+RightOut PIN 7
+RightIn  PIN 8
+REDRight  PIN 0    'Right Red LED (output)
+REDLeft   PIN 11   'left Red LED (output)
+
+'Constants defined below: (Note First letters is a capital)
+
+'Variables defined below: (Note First letter is lowercase)
+irDetectLeft  VAR Bit
+irDetectRight VAR Bit
+
+'Start Up Code
+PAUSE 500                     'Let Windows know this USB is not a MOUSE
+DEBUG "Program Starting",CR   'Message DEBUG window if USB connected
+FREQOUT Speaker,500,3000     'Signal Start of Program
+
+'USER CODE STARTS HERE:
+DEBUG "IR DETECTORS", CR
+DEBUG "LEFT   RIGHT", CR
+DEBUG "----   -----"
+
+DO WHILE (PButton)
+    FREQOUT LeftOut, 100, 38500
+    irDetectLeft = LeftIn
+    FREQOUT RightOut, 100, 38500
+    irDetectRight = RightIn
+    IF irDetectLeft = 0 THEN
+      HIGH RedLeft
+      GOSUB TrillDown
+    ELSE
+      LOW RedLeft
+    ENDIF
+
+    IF irDetectRight = 0 THEN
+      HIGH RedRight
+      GOSUB TrillUp
+    ELSE
+      LOW RedRight
+    ENDIF
+
+    DEBUG CRSRXY, 2, 4, BIN1 irDetectLeft,
+          CRSRXY, 9, 4, BIN1 irDetectRight
+    PAUSE 100
+LOOP
+
+FREQOUT Speaker, 500, 5573
+FREQOUT Speaker, 750, 3520
+DEBUG "Quittin'", CR
+END  'Conserve Battery Power if nothing left to do but wait for pushbutton or user to turn off switch
+
+'SUBROUTINES:
+TrillUp:
+    DEBUG "Right Sensor Hit", CR
+    FREQOUT Speaker, 100, 3227
+    PAUSE 25
+    FREQOUT Speaker, 100, 3520
+RETURN
+
+TrillDown:
+    DEBUG "Left Sensor Hit", CR
+    FREQOUT Speaker, 100, 3520
+    PAUSE 25
+    FREQOUT Speaker, 100, 3227
+RETURN
+' vim: ft=pbasic:sw=4:ts=4:et:

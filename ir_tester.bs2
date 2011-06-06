@@ -17,6 +17,8 @@ IRHRight  PIN 7    'Right IR Headlight (output)
 IRSRight  PIN 8    'Right IR Sensor (input)
 IRHLeft   PIN 9    'Left IR Headlight (output)
 IRSLeft   PIN 10   'Left IR Sensor (input)
+REDRight  PIN 0    'Right Red LED (output)
+REDLeft   PIN 11   'left Red LED (output)
 RWheel    PIN 12   'Right Wheel (output)
 LWheel    PIN 13   'Left Wheel (output)
 
@@ -30,41 +32,45 @@ irDetectRight VAR Bit
 'Start Up Code
 PAUSE 500                     'Let Windows know this USB is not a MOUSE
 DEBUG "Program Starting", CR  'Message DEBUG window if USB connected
-FREQOUT Speaker,500,4500,4000'Signal Start of Program
-INPUT IRHRight
-INPUT IRHLeft
+FREQOUT Speaker,500,4500      'Signal Start of Program
 
 'USER CODE STARTS HERE:
-    GOSUB Trill
-    GOSUB Trill
-GOTO Main
+GOSUB TrillDown
+GOSUB TrillDown
+PAUSE 100
+GOSUB TrillUp
+GOSUB TrillUp
 
-'SUBROUTINES:
-Main:
-    DO
-        IF (PButton = 0) THEN ProgEnd
-        GOTO CheckLeft
-    LOOP
-GOTO ProgEnd
-
-CheckLeft:
-    DEBUG "Checking Left IR", CR
+DO WHILE (PButton)
+    DEBUG "Checking IR", CR
     FREQOUT IRHLeft, 100, 38500
     irDetectLeft = IRSLeft
-    IF (irDetectLeft = 0) THEN Trill
+    FREQOUT IRHRight, 100, 38500
+    irDetectRight = IRSRight
+    IF (irDetectLeft = 0) THEN TrillDown
+    IF (irDetectRight = 0) THEN TrillUp
     PAUSE 500
-    GOTO Main
-
-Trill:
-    DEBUG "SENSOR Hit", CR
-    FREQOUT Speaker, 100, 3520
-    PAUSE 25
-    FREQOUT Speaker, 100, 3227
-    RETURN
+LOOP
 
 ProgEnd:
   FREQOUT Speaker, 500, 5573
   FREQOUT Speaker, 750, 3520
   DEBUG "Quittin'", CR
-  END 'Conserve Battery Power if nothing left to do but wait for pushbutton or user to turn off switch
+END 'Conserve Battery Power if nothing left to do but wait for pushbutton or user to turn off switch
+
+'SUBROUTINES:
+
+TrillUp:
+    DEBUG "Right Sensor Hit", CR
+    FREQOUT Speaker, 100, 3227
+    PAUSE 25
+    FREQOUT Speaker, 100, 3520
+RETURN
+
+TrillDown:
+    DEBUG "Left Sensor Hit", CR
+    FREQOUT Speaker, 100, 3520
+    PAUSE 25
+    FREQOUT Speaker, 100, 3227
+RETURN
 ' vim: ft=pbasic:sw=4:ts=4:et:

@@ -1,0 +1,142 @@
+' Troop 566 Robotics Meritbadge Class May 8th, 2011
+' Name:     Steven!
+' Filename: whisker_move.bs2
+' Version:  1.0
+' Program:  Whisker Move
+' Comments: A program to drive around avoiding front-facing
+'           Obstacles using the whiskers.
+'
+' {$STAMP BS2}     Tell Compiler what CPU we are using
+' {$PBASIC 2.5}    Tell Compiler which CPU firmware we have
+'
+' Hardware Configuration Below (Note First letter is in uppercase)
+' T566 Robot Configuration A:
+RIRin     PIN 0    'Right IR sensor (input)
+LED       PIN 1    'LED (output)
+RIRout    PIN 2    'Right IR headlight (output)
+RPhotoT   PIN 3    'Right Phototransistor sensor (input)
+Speaker   PIN 4    'Piezo Speaker (output)
+LWhisker  PIN 5    'Left Whisker sensor (input)
+LPhotoT   PIN 6    'Right Phototransistor sensor (input)
+RWhisker  PIN 7    'Right Whisker sesor (input)
+LIRout    PIN 8    'Left IR headlight (output)
+LIRin     PIN 9    'Left IR sensor (input)
+PButton   PIN 10   'Push Button (input)
+RWheel    PIN 12   'Right Wheel (output)
+LWheel    PIN 13   'Left Wheel (output)
+PINGservo PIN 14   'Ping Servo (output)
+PINGin    PIN 15   'Ping Sensor (input)
+
+'Constants defined below: (Note First letters is a capital)
+
+'Variables defined below: (Note First letter is lowercase)
+i VAR Word ' Loop index.
+
+'Start Up Code
+PAUSE 500                     'Let Windows know this USB is not a MOUSE
+DEBUG "Program Starting", CR  'Message DEBUG window if USB connected
+FREQOUT Speaker,500,4500,4000'Signal Start of Program
+INPUT LWhisker
+INPUT RWhisker
+
+'USER CODE STARTS HERE:
+
+GOSUB Main
+
+' SUBROUTINES:
+Main:
+    DO
+        IF (PButton = 0) THEN ProgEnd
+        IF (LWhisker = 0) AND (RWhisker = 0) THEN WallHit
+        IF (LWhisker = 0) THEN LWhiskerTouched
+        IF (RWhisker = 0) THEN RWhiskerTouched
+        GOSUB Forward
+    LOOP
+RETURN
+
+WallHit:
+    DEBUG "Ooof!", CR
+    GOSUB Backwards
+    GOSUB Backwards
+    GOSUB Backwards
+    GOSUB Backwards
+    GOSUB LeftUTurn
+    GOTO Main
+
+LWhiskerTouched:
+    DEBUG "L-Touched", CR
+    GOSUB AHonk
+    GOSUB Backwards
+    GOSUB RightNinety
+    GOTO Main
+
+RWhiskerTouched:
+    DEBUG "R-Touched", CR
+    GOSUB CHonk
+    GOSUB Backwards
+    GOSUB LeftNinety
+    GOTO Main
+
+Forward:
+    FOR i = 1 TO 3
+        PULSOUT RWheel, 670
+        PULSOUT LWheel, 850
+    PAUSE 20
+    NEXT
+RETURN
+
+Backwards:
+    FOR i = 1 TO 20
+        PULSOUT RWheel, 830
+        PULSOUT LWheel, 650
+    PAUSE 20
+    NEXT
+RETURN
+
+RightNinety:
+    FOR i = 1 TO 19
+        PULSOUT RWheel, 750
+        PULSOUT LWheel, 850
+    PAUSE 20
+    NEXT
+RETURN
+
+LeftNinety:
+    FOR i = 1 TO 19
+        PULSOUT RWheel, 670
+        PULSOUT LWheel, 750
+    PAUSE 20
+    NEXT
+RETURN
+
+LeftUTurn:
+    FOR i = 1 TO 39
+        PULSOUT RWheel, 830
+        PULSOUT LWheel, 850
+    PAUSE 20
+    NEXT
+RETURN
+
+RightUTurn:
+    FOR i = 1 TO 39
+        PULSOUT RWheel, 670
+        PULSOUT LWheel, 650
+    PAUSE 20
+    NEXT
+RETURN
+
+CHonk:
+    FREQOUT Speaker, 100, 5573
+    PAUSE 50
+    FREQOUT Speaker, 100, 5573
+RETURN
+
+AHonk:
+    FREQOUT Speaker, 100, 3520
+    PAUSE 50
+    FREQOUT Speaker, 100, 3520
+RETURN
+ProgEnd:
+  DEBUG "Quittin'", CR
+  END 'Conserve Battery Power if nothing left to do but wait for pushbutton or user to turn off switch
+' vim: ft=pbasic:sw=4:ts=4:et:
